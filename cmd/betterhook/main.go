@@ -1,4 +1,4 @@
-package main
+package betterhook
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	Hook "github.com/yashGoyal40/BetterHook/pkg"
 )
 
-func Betterhook(message string) {
+func SyncHook(message string) {
 	err := Hook.LoadHook(message)
 	if err != nil {
 		log.Fatalf("❌ Error: %v\n", err)
