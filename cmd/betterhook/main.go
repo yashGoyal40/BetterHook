@@ -6,7 +6,7 @@ import (
 )
 
 func betterhook(message string) {
-	err := Hook.LoadHook("pre-commit")
+	err := Hook.LoadHook(message)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
