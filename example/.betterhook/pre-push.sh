@@ -1,28 +1,53 @@
-#!/bin/bash
+#!/bin/sh
 
-# Pre-push hook script for BetterHook
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+# This hook is called with the following parameters:
+#
+# $1 -- Name of the remote to which the push is being done
+# $2 -- URL to which the push is being done
+#
+# If pushing without using a named remote those arguments will be equal.
+#
+# Information about the commits which are being pushed is supplied as lines to
+# the standard input in the form:
+#
+#   <local ref> <local oid> <remote ref> <remote oid>
+#
+# This sample shows how to prevent push of commits where the log message starts
+# with "WIP" (work in progress).
 
-echo "Running pre-push checks..."
+remote="$1"
+url="$2"
 
-# Run tests before pushing
-if command -v go test &> /dev/null; then
-  echo "🛠 Running tests..."
-  go test ./... || { echo "❌ Tests failed! Fix errors before pushing."; exit 1; }
-fi
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
 
-# Check for TODO comments
-TODO_COUNT=$(grep -r "TODO" --exclude-dir={.git,vendor} . | wc -l)
-if [[ "$TODO_COUNT" -gt 0 ]]; then
-  echo "⚠️  Found $TODO_COUNT TODO comments. Consider resolving them before pushing."
-fi
+while read local_ref local_oid remote_ref remote_oid
+do
+	if test "$local_oid" = "$zero"
+	then
+		# Handle delete
+		:
+	else
+		if test "$remote_oid" = "$zero"
+		then
+			# New branch, examine all commits
+			range="$local_oid"
+		else
+			# Update to existing branch, examine new commits
+			range="$remote_oid..$local_oid"
+		fi
 
-# Check for large files (e.g., >5MB)
-LARGE_FILES=$(git diff --cached --name-only | xargs -I {} find {} -size +5M 2>/dev/null)
-if [[ -n "$LARGE_FILES" ]]; then
-  echo "⚠️  The following files are larger than 5MB and may slow down the repository:"
-  echo "$LARGE_FILES"
-  exit 1
-fi
+		# Check for WIP commit
+		commit=$(git rev-list -n 1 --grep '^WIP' "$range")
+		if test -n "$commit"
+		then
+			echo >&2 "Found WIP commit in $local_ref, not pushing"
+			exit 1
+		fi
+	fi
+done
 
-echo "✅ Pre-push checks passed! Pushing..."
 exit 0

@@ -7,9 +7,31 @@ import (
 	"path/filepath"
 )
 
+// List of allowed Git hooks
+var allowedHooks = map[string]bool{
+	"applypatch-msg":     true,
+	"commit-msg":         true,
+	"post-update":        true,
+	"pre-applypatch":     true,
+	"pre-commit":         true,
+	"pre-merge-commit":   true,
+	"pre-push":           true,
+	"pre-rebase":         true,
+	"pre-receive":        true,
+	"prepare-commit-msg": true,
+	"push-to-checkout":   true,
+	"update":             true,
+}
+
+// isValidHookType checks if the hookType is in the allowed list
+func isValidHookType(hookType string) bool {
+	return allowedHooks[hookType]
+}
+
+// LoadHook copies the hook script from .betterhook to .git/hooks
 func LoadHook(hookType string) error {
-	if hookType != "pre-commit" && hookType != "pre-push" {
-		return fmt.Errorf("❌ Invalid hook type %q: only 'pre-commit' and 'pre-push' are allowed", hookType)
+	if !isValidHookType(hookType) {
+		return fmt.Errorf("❌ Invalid hook type %q: only standard Git hooks are allowed", hookType)
 	}
 
 	// Check if .betterhook directory exists
@@ -34,7 +56,7 @@ func LoadHook(hookType string) error {
 	}
 
 	// Define the destination path
-	destPath := "./.git/hooks/" + hookType
+	destPath := filepath.Join(hooksDir, hookType)
 
 	// Copy the file content
 	err := copyFile(srcPath, destPath)
