@@ -26,8 +26,8 @@ go get github.com/yashGoyal40/BetterHook
 4. Use BetterHook in your Go code:
 
 ```go
-betterhook("pre-commit")
-betterhook("pre-push")
+betterhook.SyncHook("pre-commit")
+betterhook.SyncHook("pre-push")
 ```
 
 ## Contributing
