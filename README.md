@@ -24,10 +24,15 @@ go get github.com/yashGoyal40/BetterHook
    - **Pre-commit hook:** [pre-commit.sh](https://github.com/yashGoyal40/BetterHook/blob/main/example/.betterhook/pre-commit.sh)
    - **Pre-push hook:** [pre-push.sh](https://github.com/yashGoyal40/BetterHook/blob/main/example/.betterhook/pre-push.sh)
 4. Use BetterHook in your Go code:
-
 ```go
-betterhook.SyncHook("pre-commit")
-betterhook.SyncHook("pre-push")
+// Sync a specific hook
+betterhook.SyncOneHook("pre-commit")
+betterhook.SyncOneHook("pre-push")
+
+// OR
+
+// Sync all hooks
+betterhook.SyncHook()
 ```
 
 ## Contributing
