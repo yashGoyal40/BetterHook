@@ -7,11 +7,12 @@ import (
 	Hook "github.com/yashGoyal40/BetterHook/pkg"
 )
 
-func SyncHook(message string) {
-	err := Hook.LoadHook(message)
+// SyncHook installs all Git hooks from the .betterhook directory
+func SyncHook() {
+	err := Hook.LoadAllHooks()
 	if err != nil {
 		log.Fatalf("❌ Error: %v\n", err)
 	} else {
-		fmt.Printf("✅ Hook %q successfully synced 🎉\n", message)
+		fmt.Println("✅ All hooks successfully synced 🎉")
 	}
 }
