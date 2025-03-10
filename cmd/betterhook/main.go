@@ -16,3 +16,12 @@ func SyncHook() {
 		fmt.Println("✅ All hooks successfully synced 🎉")
 	}
 }
+
+func SyncOneHook(hookName string) {
+	err := Hook.LoadHook(hookName)
+	if err != nil {
+		log.Fatalf("❌ Error: %v\n", err)
+	} else {
+		fmt.Printf("✅ Hook %q successfully synced 🎉\n", hookName)
+	}
+}
